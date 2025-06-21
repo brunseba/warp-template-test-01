@@ -15,6 +15,9 @@ mypy>=1.8.0
 # Pre-commit and hooks
 pre-commit>=3.6.0
 
+# Commit management and changelog generation
+commitizen>=3.13.0
+
 # Documentation testing
 mkdocs-linkcheck>=1.0.4
 

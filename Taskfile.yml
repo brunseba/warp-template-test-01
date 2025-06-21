@@ -201,24 +201,36 @@ tasks:
       - "{{.VENV_DIR}}/bin/pre-commit autoupdate"
       - echo "Pre-commit hooks updated ✓"
 
-  # Changelog Tasks
-  changelog-generate:
-    desc: "Generate changelog from conventional commits"
-    deps: [install]
+  # Commitizen Tasks
+  commit:
+    desc: "Interactive commit with Commitizen"
+    deps: [install-dev]
     cmds:
-      - "{{.PYTHON}} scripts/update_changelog.py"
+      - "{{.VENV_DIR}}/bin/cz commit"
 
-  changelog-preview:
-    desc: "Preview changelog without writing"
-    deps: [install]
+  changelog:
+    desc: "Generate changelog with Commitizen"
+    deps: [install-dev]
     cmds:
-      - "{{.PYTHON}} scripts/update_changelog.py --dry-run"
+      - "{{.VENV_DIR}}/bin/cz changelog"
 
-  changelog-force:
-    desc: "Force generate changelog even without new commits"
-    deps: [install]
+  bump:
+    desc: "Bump version and update changelog"
+    deps: [install-dev]
     cmds:
-      - "{{.PYTHON}} scripts/update_changelog.py --force"
+      - "{{.VENV_DIR}}/bin/cz bump"
+
+  bump-dry:
+    desc: "Dry run version bump"
+    deps: [install-dev]
+    cmds:
+      - "{{.VENV_DIR}}/bin/cz bump --dry-run"
+
+  version-check:
+    desc: "Check current version"
+    deps: [install-dev]
+    cmds:
+      - "{{.VENV_DIR}}/bin/cz version"
 
   version:
     desc: "Show version information"
@@ -340,10 +352,12 @@ tasks:
       - echo "  pre-commit-run     - Run pre-commit on all files"
       - echo "  pre-commit-update  - Update pre-commit hooks"
       - echo ""
-      - echo "Changelog:"
-      - echo "  changelog-generate - Generate changelog from commits"
-      - echo "  changelog-preview  - Preview changelog changes"
-      - echo "  changelog-force    - Force generate changelog"
+      - echo "Commitizen & Versioning:"
+      - echo "  commit      - Interactive commit with Commitizen"
+      - echo "  changelog   - Generate changelog with Commitizen"
+      - echo "  bump        - Bump version and update changelog"
+      - echo "  bump-dry    - Dry run version bump"
+      - echo "  version-check - Check current version"
       - echo ""
       - echo "Documentation:"
       - echo "  new-page    - Create new page (PAGE=path/to/page.md)"

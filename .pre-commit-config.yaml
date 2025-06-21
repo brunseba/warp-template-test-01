@@ -153,13 +153,12 @@ repos:
       - id: detect-secrets
         args: [--baseline, .secrets.baseline]
 
-  # Git commit message validation
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.0.0
+  # Git commit message validation with Commitizen
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
     hooks:
-      - id: conventional-pre-commit
+      - id: commitizen
         stages: [commit-msg]
-        args: [--strict]
 
   # Documentation quality
   - repo: https://github.com/Lucas-C/pre-commit-hooks
@@ -195,13 +194,6 @@ repos:
         files: ^(docs/.*\.md|mkdocs\.yml)$
         pass_filenames: false
 
-      - id: changelog-update
-        name: Update Changelog
-        entry: bash -c 'python3 scripts/update_changelog.py'
-        language: system
-        stages: [post-commit]
-        pass_filenames: false
-        always_run: true
 
   # Performance and optimization
   - repo: https://github.com/asottile/pyupgrade

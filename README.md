@@ -171,19 +171,22 @@ This template includes comprehensive code quality tools and pre-commit hooks for
 - **SQL**: sqlfluff
 - **Security**: detect-secrets
 
-### Automatic Changelog
+### Commitizen Integration
 
-Generate changelogs automatically from conventional commits:
+Use Commitizen for structured commits and automatic changelog generation:
 
 ```bash
-# Generate changelog
-task changelog-generate
+# Interactive commit with guided prompts
+task commit
 
-# Preview without writing
-task changelog-preview
+# Generate changelog from commits
+task changelog
 
-# Force generation
-task changelog-force
+# Bump version and update changelog
+task bump
+
+# Dry run version bump
+task bump-dry
 ```
 
 ## 🛠️ Development
@@ -227,7 +230,8 @@ task clean
 | `task clean` | Clean build artifacts |
 | `task pre-commit-install` | Install pre-commit hooks |
 | `task pre-commit-run` | Run code quality checks |
-| `task changelog-generate` | Generate changelog from commits |
+| `task commit` | Interactive commit with Commitizen |
+| `task changelog` | Generate changelog from commits |
 | `task stats` | Show documentation statistics |
 | `task new-page PAGE=path/to/page.md` | Create new page |
 

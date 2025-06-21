@@ -1,0 +1,116 @@
+# Commitizen configuration for Template Documentation
+# See https://commitizen-tools.github.io/commitizen/config/
+
+commitizen:
+  # Use conventional commits style
+  name: cz_conventional_commits
+  
+  # Version management
+  version_scheme: semantic
+  version_provider: scm
+  
+  # Changelog configuration
+  changelog_file: docs/changelog.md
+  changelog_format: $version ($date)
+  changelog_start_rev: HEAD
+  
+  # Version files to update
+  version_files:
+    - VERSION
+    - pyproject.toml:version
+    - mkdocs.yml:extra.version
+  
+  # Git tag configuration
+  tag_format: v$version
+  annotated_tag: true
+  
+  # Bump message template
+  bump_message: "bump: version $current_version → $new_version"
+  
+  # Custom scopes for this project
+  allowed_scopes:
+    - docs
+    - mkdocs
+    - theme
+    - plugins
+    - config
+    - scripts
+    - pre-commit
+    - ci
+    - deps
+    - build
+    - deploy
+    - api
+    - user-guide
+    - contributing
+    - changelog
+    - task
+    - quality
+    - security
+    - performance
+    - testing
+    - automation
+    - workflow
+  
+  # Additional configuration
+  update_changelog_on_bump: true
+  use_shortcuts: true
+  
+  # Questions configuration for interactive commits
+  questions:
+    - type: list
+      name: type
+      message: "Select the type of change that you're committing:"
+      choices:
+        - value: feat
+          name: "feat: A new feature"
+        - value: fix
+          name: "fix: A bug fix"
+        - value: docs
+          name: "docs: Documentation only changes"
+        - value: style
+          name: "style: Changes that do not affect the meaning of the code"
+        - value: refactor
+          name: "refactor: A code change that neither fixes a bug nor adds a feature"
+        - value: perf
+          name: "perf: A code change that improves performance"
+        - value: test
+          name: "test: Adding missing tests or correcting existing tests"
+        - value: build
+          name: "build: Changes that affect the build system or external dependencies"
+        - value: ci
+          name: "ci: Changes to our CI configuration files and scripts"
+        - value: chore
+          name: "chore: Other changes that don't modify src or test files"
+        - value: revert
+          name: "revert: Reverts a previous commit"
+    
+    - type: input
+      name: scope
+      message: "What is the scope of this change (e.g. component or file name): (press enter to skip)"
+    
+    - type: input
+      name: subject
+      message: "Write a short, imperative tense description of the change (max 50 chars):"
+      validate: |
+        if len(value) > 50:
+            return "Subject must be 50 characters or less"
+        return True
+    
+    - type: input
+      name: body
+      message: "Provide a longer description of the change: (press enter to skip)"
+    
+    - type: confirm
+      name: is_breaking_change
+      message: "Are there any breaking changes?"
+      default: false
+    
+    - type: input
+      name: breaking
+      message: "Describe the breaking changes:"
+      when: "{{ answers.is_breaking_change }}"
+    
+    - type: input
+      name: footer
+      message: "List any issues closed by this change (e.g. #31, #34): (press enter to skip)"
