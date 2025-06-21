@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Feat
+
+- integrate uv for modern Python package management
+
 ### Fix
 
 - resolve Commitizen changelog generation with proper configuration and command

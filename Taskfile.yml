@@ -225,7 +225,7 @@ tasks:
   uv-check:
     desc: "Check for dependency issues"
     cmds:
-      - "{{.UV}} sync --check"
+      - "{{.UV}} lock --check"
       - echo "Dependencies check passed ✓"
 
   # Git and Version Management Tasks

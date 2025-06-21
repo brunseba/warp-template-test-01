@@ -102,8 +102,9 @@ plugins:
         - index.md
   - git-committers:
       repository: .
-      branch: main
+      branch: master
       docs_path: docs/
+      enabled: false
       exclude:
         - index.md
   - with-pdf:
