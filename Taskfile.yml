@@ -26,7 +26,7 @@ tasks:
     cmds:
       - "{{.PYTHON}} -m venv {{.VENV_DIR}}"
       - echo "Virtual environment created at {{.VENV_DIR}}"
-      - echo "Activate with: source {{.VENV_DIR}}/bin/activate"
+      - 'echo "Activate with: source {{.VENV_DIR}}/bin/activate"'
     status:
       - test -d {{.VENV_DIR}}
 
