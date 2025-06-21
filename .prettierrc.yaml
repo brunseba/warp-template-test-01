@@ -1,0 +1,52 @@
+# Prettier configuration for Template Documentation
+# See https://prettier.io/docs/en/configuration.html
+
+# Basic formatting
+printWidth: 88
+tabWidth: 2
+useTabs: false
+semi: true
+singleQuote: true
+quoteProps: "as-needed"
+trailingComma: "es5"
+
+# JSX
+jsxSingleQuote: false
+jsxBracketSameLine: false
+
+# Markdown
+proseWrap: "preserve"
+
+# HTML
+htmlWhitespaceSensitivity: "css"
+
+# Vue
+vueIndentScriptAndStyle: false
+
+# Line endings
+endOfLine: "lf"
+
+# Embedded language formatting
+embeddedLanguageFormatting: "auto"
+
+# File type specific overrides
+overrides:
+  - files: "*.md"
+    options:
+      printWidth: 80
+      proseWrap: "always"
+  
+  - files: "*.{yaml,yml}"
+    options:
+      printWidth: 80
+      singleQuote: false
+  
+  - files: "*.json"
+    options:
+      printWidth: 80
+      tabWidth: 2
+  
+  - files: "*.{css,scss}"
+    options:
+      printWidth: 100
+      singleQuote: false

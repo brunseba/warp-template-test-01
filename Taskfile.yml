@@ -45,7 +45,7 @@ tasks:
     desc: "Install development dependencies"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install pytest pytest-cov black flake8 mypy pre-commit"
+      - "{{.VENV_DIR}}/bin/pip install -r requirements-dev.txt"
       - echo "Development dependencies installed"
 
   # Development Tasks
@@ -178,6 +178,48 @@ tasks:
       - git config pull.rebase true
       - echo "Git configuration completed ✓"
 
+  # Pre-commit Tasks
+  pre-commit-install:
+    desc: "Install pre-commit hooks"
+    deps: [install-dev]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pre-commit install"
+      - "{{.VENV_DIR}}/bin/pre-commit install --hook-type commit-msg"
+      - "{{.VENV_DIR}}/bin/pre-commit install --hook-type post-commit"
+      - echo "Pre-commit hooks installed ✓"
+
+  pre-commit-run:
+    desc: "Run pre-commit on all files"
+    deps: [install-dev]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pre-commit run --all-files"
+
+  pre-commit-update:
+    desc: "Update pre-commit hooks"
+    deps: [install-dev]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pre-commit autoupdate"
+      - echo "Pre-commit hooks updated ✓"
+
+  # Changelog Tasks
+  changelog-generate:
+    desc: "Generate changelog from conventional commits"
+    deps: [install]
+    cmds:
+      - "{{.PYTHON}} scripts/update_changelog.py"
+
+  changelog-preview:
+    desc: "Preview changelog without writing"
+    deps: [install]
+    cmds:
+      - "{{.PYTHON}} scripts/update_changelog.py --dry-run"
+
+  changelog-force:
+    desc: "Force generate changelog even without new commits"
+    deps: [install]
+    cmds:
+      - "{{.PYTHON}} scripts/update_changelog.py --force"
+
   version:
     desc: "Show version information"
     deps: [install]
@@ -292,6 +334,16 @@ tasks:
       - echo "  clean       - Clean build artifacts"
       - echo "  clean-all   - Clean everything"
       - echo "  update      - Update dependencies"
+      - echo ""
+      - echo "Pre-commit & Quality:"
+      - echo "  pre-commit-install - Install pre-commit hooks"
+      - echo "  pre-commit-run     - Run pre-commit on all files"
+      - echo "  pre-commit-update  - Update pre-commit hooks"
+      - echo ""
+      - echo "Changelog:"
+      - echo "  changelog-generate - Generate changelog from commits"
+      - echo "  changelog-preview  - Preview changelog changes"
+      - echo "  changelog-force    - Force generate changelog"
       - echo ""
       - echo "Documentation:"
       - echo "  new-page    - Create new page (PAGE=path/to/page.md)"

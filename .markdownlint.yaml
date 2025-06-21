@@ -1,0 +1,84 @@
+# Markdownlint configuration for Template Documentation
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default state for all rules
+default: true
+
+# Disable specific rules
+MD013: false  # Line length - handled by prettier
+MD033: false  # Allow inline HTML (needed for custom styling)
+MD041: false  # First line should be top-level header (not always needed)
+
+# Configure specific rules
+MD003:
+  # Header style
+  style: "atx"
+
+MD004:
+  # Unordered list style
+  style: "dash"
+
+MD007:
+  # Unordered list indentation
+  indent: 2
+
+MD009:
+  # Trailing spaces
+  br_spaces: 2
+
+MD010:
+  # Hard tabs
+  code_blocks: false
+
+MD012:
+  # Multiple consecutive blank lines
+  maximum: 2
+
+MD022:
+  # Headers should be surrounded by blank lines
+  lines_above: 1
+  lines_below: 1
+
+MD024:
+  # Multiple headers with same content
+  allow_different_nesting: true
+
+MD025:
+  # Multiple top level headers
+  level: 1
+
+MD026:
+  # Trailing punctuation in header
+  punctuation: ".,;:!?"
+
+MD029:
+  # Ordered list item prefix
+  style: "ordered"
+
+MD030:
+  # Spaces after list markers
+  ul_single: 1
+  ol_single: 1
+  ul_multi: 1
+  ol_multi: 1
+
+MD035:
+  # Horizontal rule style
+  style: "---"
+
+MD036:
+  # Emphasis used instead of header
+  punctuation: ".,;:!?。，；：！？"
+
+MD040:
+  # Fenced code blocks should have a language
+  allowed_languages: []
+  language_only: false
+
+MD046:
+  # Code block style
+  style: "fenced"
+
+MD048:
+  # Code fence style
+  style: "backtick"

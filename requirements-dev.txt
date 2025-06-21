@@ -1,0 +1,34 @@
+# Development dependencies for Template Documentation
+# Code quality and testing tools
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+coverage>=7.3.2
+
+# Code formatting and linting
+black>=23.12.1
+isort>=5.13.2
+flake8>=7.0.0
+mypy>=1.8.0
+
+# Pre-commit and hooks
+pre-commit>=3.6.0
+
+# Documentation testing
+mkdocs-linkcheck>=1.0.4
+
+# Security scanning
+bandit>=1.7.6
+safety>=2.3.4
+
+# Additional linting tools
+pylint>=3.0.3
+pycodestyle>=2.11.1
+pydocstyle>=6.3.0
+
+# YAML linting
+yamllint>=1.33.0
+
+# JSON validation
+jsonschema>=4.20.0

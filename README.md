@@ -140,6 +140,52 @@ git commit -m "fix: resolve navigation issue"
 git commit -m "docs: update installation guide"
 ```
 
+## 🔧 Code Quality & Pre-commit
+
+This template includes comprehensive code quality tools and pre-commit hooks for multiple languages:
+
+### Pre-commit Setup
+
+1. **Install pre-commit hooks**:
+   ```bash
+   task pre-commit-install
+   ```
+
+2. **Run checks manually**:
+   ```bash
+   task pre-commit-run
+   ```
+
+### Supported Languages & Tools
+
+- **Python**: Black, isort, flake8, bandit, mypy
+- **JavaScript/TypeScript**: ESLint, Prettier
+- **CSS/SCSS**: Stylelint
+- **Markdown**: markdownlint, prettier
+- **YAML/JSON**: yamllint, prettier
+- **Shell Scripts**: shellcheck
+- **Docker**: hadolint
+- **Go**: gofmt, golangci-lint
+- **Rust**: rustfmt, clippy
+- **Java**: google-java-format
+- **SQL**: sqlfluff
+- **Security**: detect-secrets
+
+### Automatic Changelog
+
+Generate changelogs automatically from conventional commits:
+
+```bash
+# Generate changelog
+task changelog-generate
+
+# Preview without writing
+task changelog-preview
+
+# Force generation
+task changelog-force
+```
+
 ## 🛠️ Development
 
 ### Using Task (Recommended)
@@ -179,6 +225,9 @@ task clean
 | `task build-pdf` | Build with PDF export |
 | `task check` | Run all validation checks |
 | `task clean` | Clean build artifacts |
+| `task pre-commit-install` | Install pre-commit hooks |
+| `task pre-commit-run` | Run code quality checks |
+| `task changelog-generate` | Generate changelog from commits |
 | `task stats` | Show documentation statistics |
 | `task new-page PAGE=path/to/page.md` | Create new page |
 
