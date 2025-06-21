@@ -32,3 +32,6 @@ yamllint>=1.33.0
 
 # JSON validation
 jsonschema>=4.20.0
+
+# YAML processing
+PyYAML>=6.0.2
