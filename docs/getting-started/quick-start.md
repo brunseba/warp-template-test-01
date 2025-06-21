@@ -4,8 +4,35 @@ Get up and running with the Template Documentation in minutes!
 
 ## Development Workflow
 
+### Using Task (Recommended)
+
+This project includes a `Taskfile.yml` for easy task management. Install [Task](https://taskfile.dev/#/installation) first, then:
+
+```bash
+# Show all available tasks
+task help
+
+# Set up development environment
+task setup
+
+# Start development server
+task serve
+
+# Build documentation
+task build
+
+# Build with PDF export
+task build-pdf
+```
+
 ### 1. Start the Development Server
 
+**With Task:**
+```bash
+task serve
+```
+
+**Without Task:**
 ```bash
 mkdocs serve
 ```
@@ -33,6 +60,19 @@ docs/
 Open your browser to `http://localhost:8000` to see your changes in real-time.
 
 ## Basic Commands
+
+### With Task (Recommended)
+
+| Task Command | Description |
+|--------------|-------------|
+| `task serve` | Start development server |
+| `task build` | Build static site |
+| `task build-pdf` | Build with PDF export |
+| `task check` | Run all validation checks |
+| `task clean` | Clean build artifacts |
+| `task help` | Show all available tasks |
+
+### Without Task
 
 | Command | Description |
 |---------|-------------|

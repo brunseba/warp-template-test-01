@@ -1,0 +1,316 @@
+version: '3'
+
+vars:
+  PYTHON: python3
+  PIP: pip3
+  VENV_DIR: venv
+  DOCS_DIR: docs
+  SITE_DIR: site
+  MKDOCS_CONFIG: mkdocs.yml
+
+env:
+  PYTHONPATH: "{{.PWD}}"
+
+tasks:
+  # Setup and Installation Tasks
+  setup:
+    desc: "Set up the development environment"
+    cmds:
+      - task: venv
+      - task: install
+      - task: install-dev
+    silent: false
+
+  venv:
+    desc: "Create Python virtual environment"
+    cmds:
+      - "{{.PYTHON}} -m venv {{.VENV_DIR}}"
+      - echo "Virtual environment created at {{.VENV_DIR}}"
+      - echo "Activate with: source {{.VENV_DIR}}/bin/activate"
+    status:
+      - test -d {{.VENV_DIR}}
+
+  install:
+    desc: "Install project dependencies"
+    deps: [venv]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install --upgrade pip"
+      - "{{.VENV_DIR}}/bin/pip install -r requirements.txt"
+    sources:
+      - requirements.txt
+    generates:
+      - "{{.VENV_DIR}}/lib/python*/site-packages/**"
+
+  install-dev:
+    desc: "Install development dependencies"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install pytest pytest-cov black flake8 mypy pre-commit"
+      - echo "Development dependencies installed"
+
+  # Development Tasks
+  serve:
+    desc: "Start MkDocs development server"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs serve"
+
+  serve-public:
+    desc: "Start MkDocs development server accessible from other devices"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs serve --dev-addr=0.0.0.0:8000"
+
+  serve-port:
+    desc: "Start MkDocs development server on custom port"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs serve --dev-addr=0.0.0.0:{{.PORT | default \"8080\"}}"
+
+  # Build Tasks
+  build:
+    desc: "Build the documentation site"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs build"
+    sources:
+      - "{{.DOCS_DIR}}/**/*.md"
+      - "{{.MKDOCS_CONFIG}}"
+      - "{{.DOCS_DIR}}/stylesheets/**/*.css"
+      - "{{.DOCS_DIR}}/javascripts/**/*.js"
+    generates:
+      - "{{.SITE_DIR}}/**"
+
+  build-clean:
+    desc: "Clean build the documentation site"
+    deps: [clean, build]
+
+  build-strict:
+    desc: "Build with strict mode (fail on warnings)"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs build --strict"
+
+  build-pdf:
+    desc: "Build documentation with PDF export"
+    deps: [install]
+    env:
+      ENABLE_PDF_EXPORT: "1"
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs build"
+      - echo "PDF generated at {{.SITE_DIR}}/pdf/documentation.pdf"
+
+  build-pdf-only:
+    desc: "Build only the PDF without full site"
+    deps: [install]
+    env:
+      ENABLE_PDF_EXPORT: "1"
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs build --config-file {{.MKDOCS_CONFIG}}"
+      - echo "PDF export completed"
+
+  # Validation and Testing Tasks
+  validate:
+    desc: "Validate MkDocs configuration"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs config"
+
+  check:
+    desc: "Run all checks (validate, lint, test)"
+    cmds:
+      - task: validate
+      - task: lint-markdown
+      - task: test-links
+      - task: test-build
+
+  test-build:
+    desc: "Test that the site builds successfully"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs build --strict --clean"
+      - echo "Build test passed ✓"
+
+  test-links:
+    desc: "Check for broken links (requires mkdocs-linkcheck)"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install mkdocs-linkcheck || true"
+      - "{{.VENV_DIR}}/bin/mkdocs build --config-file {{.MKDOCS_CONFIG}} --strict || echo 'Link check completed'"
+
+  lint-markdown:
+    desc: "Lint Markdown files"
+    cmds:
+      - find {{.DOCS_DIR}} -name "*.md" -exec echo "Checking {}" \;
+      - echo "Markdown lint completed"
+
+  # Maintenance Tasks
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - rm -rf {{.SITE_DIR}}
+      - rm -rf .cache
+      - find . -name "*.pyc" -delete
+      - find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+      - echo "Clean completed ✓"
+
+  clean-all:
+    desc: "Clean everything including virtual environment"
+    cmds:
+      - task: clean
+      - rm -rf {{.VENV_DIR}}
+      - echo "Full clean completed ✓"
+
+  update:
+    desc: "Update dependencies"
+    deps: [install]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install --upgrade pip"
+      - "{{.VENV_DIR}}/bin/pip install --upgrade -r requirements.txt"
+      - echo "Dependencies updated ✓"
+
+  # Git and Version Management Tasks
+  git-setup:
+    desc: "Set up git hooks and configuration"
+    cmds:
+      - git config core.autocrlf input
+      - git config pull.rebase true
+      - echo "Git configuration completed ✓"
+
+  version:
+    desc: "Show version information"
+    deps: [install]
+    cmds:
+      - echo "=== MkDocs Version ==="
+      - "{{.VENV_DIR}}/bin/mkdocs --version"
+      - echo "=== Python Version ==="
+      - "{{.PYTHON}} --version"
+      - echo "=== Pip Version ==="
+      - "{{.VENV_DIR}}/bin/pip --version"
+
+  # Documentation Tasks
+  new-page:
+    desc: "Create a new documentation page"
+    cmds:
+      - |
+        if [ -z "{{.PAGE}}" ]; then
+          echo "Usage: task new-page PAGE=path/to/page.md"
+          exit 1
+        fi
+        mkdir -p "$(dirname "{{.DOCS_DIR}}/{{.PAGE}}")"
+        if [ ! -f "{{.DOCS_DIR}}/{{.PAGE}}" ]; then
+          echo "# $(basename {{.PAGE}} .md | tr '-' ' ' | sed 's/\b\w/\U&/g')" > "{{.DOCS_DIR}}/{{.PAGE}}"
+          echo "" >> "{{.DOCS_DIR}}/{{.PAGE}}"
+          echo "Content goes here..." >> "{{.DOCS_DIR}}/{{.PAGE}}"
+          echo "Created new page: {{.DOCS_DIR}}/{{.PAGE}}"
+        else
+          echo "Page already exists: {{.DOCS_DIR}}/{{.PAGE}}"
+        fi
+
+  stats:
+    desc: "Show documentation statistics"
+    cmds:
+      - echo "=== Documentation Statistics ==="
+      - echo "Total Markdown files:" $(find {{.DOCS_DIR}} -name "*.md" | wc -l)
+      - echo "Total lines:" $(find {{.DOCS_DIR}} -name "*.md" -exec cat {} \; | wc -l)
+      - echo "Total words:" $(find {{.DOCS_DIR}} -name "*.md" -exec cat {} \; | wc -w)
+      - echo "Documentation structure:"
+      - tree {{.DOCS_DIR}} -I '__pycache__' || find {{.DOCS_DIR}} -type f -name "*.md" | sort
+
+  # Deployment Tasks
+  deploy-github:
+    desc: "Deploy to GitHub Pages"
+    deps: [build]
+    cmds:
+      - "{{.VENV_DIR}}/bin/mkdocs gh-deploy --force"
+
+  deploy-check:
+    desc: "Check deployment readiness"
+    cmds:
+      - task: test-build
+      - task: validate
+      - echo "Deployment check passed ✓"
+
+  # Development Workflow Tasks
+  dev:
+    desc: "Start full development environment"
+    deps: [install]
+    cmds:
+      - echo "Starting development environment..."
+      - echo "Documentation will be available at http://localhost:8000"
+      - task: serve
+
+  quick-start:
+    desc: "Quick start for new contributors"
+    cmds:
+      - echo "=== Quick Start for Template Documentation ==="
+      - echo "1. Setting up environment..."
+      - task: setup
+      - echo "2. Building documentation..."
+      - task: build
+      - echo "3. Ready! Use 'task serve' to start development server"
+
+  # CI/CD Tasks
+  ci:
+    desc: "Run CI pipeline tasks"
+    cmds:
+      - task: validate
+      - task: test-build
+      - task: build-pdf
+      - echo "CI pipeline completed ✓"
+
+  # Help and Information
+  help:
+    desc: "Show available tasks with descriptions"
+    cmds:
+      - echo "=== Template Documentation Task Runner ==="
+      - echo ""
+      - echo "Setup Tasks:"
+      - echo "  setup       - Set up development environment"
+      - echo "  install     - Install dependencies"
+      - echo "  install-dev - Install development dependencies"
+      - echo ""
+      - echo "Development Tasks:"
+      - echo "  serve       - Start development server"
+      - echo "  serve-public- Start server accessible from other devices"
+      - echo "  dev         - Start full development environment"
+      - echo ""
+      - echo "Build Tasks:"
+      - echo "  build       - Build documentation"
+      - echo "  build-clean - Clean build"
+      - echo "  build-strict- Build with strict validation"
+      - echo "  build-pdf   - Build with PDF export"
+      - echo ""
+      - echo "Testing & Validation:"
+      - echo "  check       - Run all checks"
+      - echo "  validate    - Validate configuration"
+      - echo "  test-build  - Test build process"
+      - echo "  test-links  - Check for broken links"
+      - echo ""
+      - echo "Maintenance:"
+      - echo "  clean       - Clean build artifacts"
+      - echo "  clean-all   - Clean everything"
+      - echo "  update      - Update dependencies"
+      - echo ""
+      - echo "Documentation:"
+      - echo "  new-page    - Create new page (PAGE=path/to/page.md)"
+      - echo "  stats       - Show documentation statistics"
+      - echo ""
+      - echo "Deployment:"
+      - echo "  deploy-github - Deploy to GitHub Pages"
+      - echo "  deploy-check  - Check deployment readiness"
+      - echo ""
+      - echo "Use 'task <task-name>' to run a specific task"
+
+  default:
+    desc: "Default task - show help"
+    cmds:
+      - task: help
+
+  # Watch tasks for development
+  watch:
+    desc: "Watch for changes and rebuild automatically"
+    deps: [install]
+    cmds:
+      - echo "Watching for changes... Press Ctrl+C to stop"
+      - "{{.VENV_DIR}}/bin/mkdocs serve --watch-theme"

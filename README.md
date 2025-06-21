@@ -25,8 +25,31 @@ A comprehensive MkDocs documentation template with advanced features including g
 - Python 3.8+
 - Git
 - Google Chrome (for PDF export)
+- [Task](https://taskfile.dev/#/installation) (optional but recommended)
 
 ### Installation
+
+#### Option 1: Using Task (Recommended)
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/template-doc.git
+   cd template-doc
+   ```
+
+2. **Set up everything with one command**:
+   ```bash
+   task setup
+   ```
+
+3. **Start development server**:
+   ```bash
+   task serve
+   ```
+
+4. **Open your browser** to `http://localhost:8000`
+
+#### Option 2: Manual Setup
 
 1. **Clone the repository**:
    ```bash
@@ -119,7 +142,49 @@ git commit -m "docs: update installation guide"
 
 ## 🛠️ Development
 
-### Local Development
+### Using Task (Recommended)
+
+This project includes a comprehensive `Taskfile.yml` for easy task management:
+
+```bash
+# Show all available tasks
+task help
+
+# Quick setup for new contributors
+task quick-start
+
+# Start development server
+task serve
+
+# Build documentation
+task build
+
+# Build with PDF export
+task build-pdf
+
+# Run all checks
+task check
+
+# Clean build artifacts
+task clean
+```
+
+#### Key Task Commands
+
+| Task | Description |
+|------|-------------|
+| `task setup` | Set up development environment |
+| `task serve` | Start development server |
+| `task build` | Build documentation |
+| `task build-pdf` | Build with PDF export |
+| `task check` | Run all validation checks |
+| `task clean` | Clean build artifacts |
+| `task stats` | Show documentation statistics |
+| `task new-page PAGE=path/to/page.md` | Create new page |
+
+### Manual Development
+
+If you prefer not to use Task:
 
 ```bash
 # Start development server with live reload
