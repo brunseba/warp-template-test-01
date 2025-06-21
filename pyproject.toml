@@ -1,0 +1,276 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "template-doc"
+dynamic = ["version"]
+description = "MkDocs documentation template with modern tooling and best practices"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Template Documentation Team", email = "team@example.com"},
+]
+keywords = ["documentation", "mkdocs", "template", "material", "docs"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+requires-python = ">=3.9"
+
+# Core documentation dependencies
+dependencies = [
+    "mkdocs>=1.5.3",
+    "mkdocs-material>=9.5.0",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.4",
+    "mkdocs-git-authors-plugin>=0.7.2",
+    "mkdocs-awesome-pages-plugin>=2.9.2",
+    "mkdocs-include-markdown-plugin>=6.0.4",
+    "mkdocs-macros-plugin>=1.0.5",
+    "mkdocs-minify-plugin>=0.7.1",
+    "mkdocs-redirects>=1.2.1",
+    "mkdocs-section-index>=0.3.8",
+    "mkdocs-literate-nav>=0.6.1",
+    "mkdocs-gen-files>=0.5.0",
+    "mkdocs-glightbox>=0.3.5",
+    "mkdocs-table-reader-plugin>=2.0.3",
+    "pymdown-extensions>=10.7.1",
+    "markdown-callouts>=0.3.0",
+    "pillow>=10.1.0",
+    "cairosvg>=2.7.1",
+]
+
+[project.optional-dependencies]
+# Development dependencies
+dev = [
+    # Testing
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.3.2",
+    
+    # Code quality
+    "black>=23.12.1",
+    "isort>=5.13.2",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    
+    # Pre-commit and hooks
+    "pre-commit>=3.6.0",
+    
+    # Version management
+    "commitizen>=3.13.0",
+    
+    # Link checking
+    "mkdocs-linkcheck>=1.0.4",
+    
+    # Security
+    "bandit>=1.7.6",
+    "safety>=2.3.4",
+    
+    # Additional linting
+    "pylint>=3.0.3",
+    "pycodestyle>=2.11.1",
+    "pydocstyle>=6.3.0",
+    
+    # YAML validation
+    "yamllint>=1.33.0",
+    
+    # JSON schema validation
+    "jsonschema>=4.20.0",
+    
+    # Utilities
+    "PyYAML>=6.0.2",
+]
+
+# PDF export dependencies
+pdf = [
+    "weasyprint>=61.0",
+]
+
+# Performance monitoring
+performance = [
+    "mkdocs-minify-plugin>=0.7.1",
+]
+
+# All optional dependencies
+all = [
+    "template-doc[dev,pdf,performance]",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/your-org/template-doc"
+"Repository" = "https://github.com/your-org/template-doc"
+"Documentation" = "https://your-org.github.io/template-doc"
+"Issue Tracker" = "https://github.com/your-org/template-doc/issues"
+"Changelog" = "https://github.com/your-org/template-doc/blob/main/docs/changelog.md"
+
+[project.scripts]
+template-doc = "template_doc.cli:main"
+
+# Hatchling configuration for version from VERSION file
+[tool.hatch.version]
+path = "VERSION"
+pattern = "(?P<version>.*)"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/template_doc"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/docs",
+    "/mkdocs.yml",
+    "/Taskfile.yml",
+    "/VERSION",
+    "/README.md",
+    "/LICENSE",
+]
+
+# Tool configurations
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | site
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src", "tests", "scripts"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "site", ".venv", "venv"]
+skips = ["B101", "B601"]
+
+[tool.pylint]
+jobs = 0
+disable = [
+    "missing-docstring",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-locals",
+    "duplicate-code",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version_provider = "pep621"
+version_scheme = "semver"
+version_files = [
+    "VERSION",
+    "pyproject.toml:version"
+]
+update_changelog_on_bump = true
+changelog_file = "docs/changelog.md"
+tag_format = "v$version"
+annotated_tag = true
+bump_message = "bump: version $current_version → $new_version"
+
+# uv-specific configuration
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.3.2",
+    "black>=23.12.1",
+    "isort>=5.13.2",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+    "commitizen>=3.13.0",
+    "mkdocs-linkcheck>=1.0.4",
+    "bandit>=1.7.6",
+    "safety>=2.3.4",
+    "pylint>=3.0.3",
+    "pycodestyle>=2.11.1",
+    "pydocstyle>=6.3.0",
+    "yamllint>=1.33.0",
+    "jsonschema>=4.20.0",
+    "PyYAML>=6.0.2",
+]

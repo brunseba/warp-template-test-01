@@ -2,8 +2,8 @@ version: '3'
 
 vars:
   PYTHON: python3
-  PIP: pip3
-  VENV_DIR: venv
+  UV: uv
+  VENV_DIR: .venv
   DOCS_DIR: docs
   SITE_DIR: site
   MKDOCS_CONFIG: mkdocs.yml
@@ -16,63 +16,66 @@ tasks:
   setup:
     desc: "Set up the development environment"
     cmds:
-      - task: venv
-      - task: install
       - task: install-dev
+      - echo "Development environment setup complete ✓"
     silent: false
 
-  venv:
-    desc: "Create Python virtual environment"
+  uv-sync:
+    desc: "Sync dependencies using uv"
     cmds:
-      - "{{.PYTHON}} -m venv {{.VENV_DIR}}"
-      - echo "Virtual environment created at {{.VENV_DIR}}"
-      - 'echo "Activate with: source {{.VENV_DIR}}/bin/activate"'
-    status:
-      - test -d {{.VENV_DIR}}
+      - "{{.UV}} sync"
+      - echo "Dependencies synced with uv ✓"
+    sources:
+      - pyproject.toml
+      - uv.lock
+    generates:
+      - "{{.VENV_DIR}}/pyvenv.cfg"
 
   install:
-    desc: "Install project dependencies"
-    deps: [venv]
+    desc: "Install project dependencies using uv"
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install --upgrade pip"
-      - "{{.VENV_DIR}}/bin/pip install -r requirements.txt"
+      - "{{.UV}} sync"
+      - echo "Project dependencies installed with uv ✓"
     sources:
-      - requirements.txt
+      - pyproject.toml
     generates:
       - "{{.VENV_DIR}}/lib/python*/site-packages/**"
 
   install-dev:
-    desc: "Install development dependencies"
-    deps: [install]
+    desc: "Install development dependencies using uv"
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install -r requirements-dev.txt"
-      - echo "Development dependencies installed"
+      - "{{.UV}} sync --extra dev"
+      - echo "Development dependencies installed with uv ✓"
+    sources:
+      - pyproject.toml
+    generates:
+      - "{{.VENV_DIR}}/lib/python*/site-packages/**"
 
   # Development Tasks
   serve:
     desc: "Start MkDocs development server"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs serve"
+      - "{{.UV}} run mkdocs serve"
 
   serve-public:
     desc: "Start MkDocs development server accessible from other devices"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs serve --dev-addr=0.0.0.0:8000"
+      - "{{.UV}} run mkdocs serve --dev-addr=0.0.0.0:8000"
 
   serve-port:
     desc: "Start MkDocs development server on custom port"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs serve --dev-addr=0.0.0.0:{{.PORT | default \"8080\"}}"
+      - "{{.UV}} run mkdocs serve --dev-addr=0.0.0.0:{{.PORT | default \"8080\"}}"
 
   # Build Tasks
   build:
     desc: "Build the documentation site"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build"
+      - "{{.UV}} run mkdocs build"
     sources:
       - "{{.DOCS_DIR}}/**/*.md"
       - "{{.MKDOCS_CONFIG}}"
@@ -89,7 +92,7 @@ tasks:
     desc: "Build with strict mode (fail on warnings)"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build --strict"
+      - "{{.UV}} run mkdocs build --strict"
 
   build-pdf:
     desc: "Build documentation with PDF export"
@@ -97,7 +100,7 @@ tasks:
     env:
       ENABLE_PDF_EXPORT: "1"
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build"
+      - "{{.UV}} run mkdocs build"
       - echo "PDF generated at {{.SITE_DIR}}/pdf/documentation.pdf"
 
   build-pdf-only:
@@ -106,7 +109,7 @@ tasks:
     env:
       ENABLE_PDF_EXPORT: "1"
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build --config-file {{.MKDOCS_CONFIG}}"
+      - "{{.UV}} run mkdocs build --config-file {{.MKDOCS_CONFIG}}"
       - echo "PDF export completed"
 
   # Validation and Testing Tasks
@@ -114,7 +117,7 @@ tasks:
     desc: "Validate MkDocs configuration"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build --strict --quiet || echo 'Configuration validation completed'"
+      - "{{.UV}} run mkdocs build --strict --quiet || echo 'Configuration validation completed'"
       - echo "MkDocs configuration is valid ✓"
 
   check:
@@ -129,15 +132,15 @@ tasks:
     desc: "Test that the site builds successfully"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs build --strict --clean"
+      - "{{.UV}} run mkdocs build --strict --clean"
       - echo "Build test passed ✓"
 
   test-links:
     desc: "Check for broken links (requires mkdocs-linkcheck)"
     deps: [install]
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install mkdocs-linkcheck || true"
-      - "{{.VENV_DIR}}/bin/mkdocs build --config-file {{.MKDOCS_CONFIG}} --strict || echo 'Link check completed'"
+      - "{{.UV}} run pip install mkdocs-linkcheck || true"
+      - "{{.UV}} run mkdocs build --config-file {{.MKDOCS_CONFIG}} --strict || echo 'Link check completed'"
 
   lint-markdown:
     desc: "Lint Markdown files"
@@ -163,12 +166,67 @@ tasks:
       - echo "Full clean completed ✓"
 
   update:
-    desc: "Update dependencies"
-    deps: [install]
+    desc: "Update dependencies using uv"
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install --upgrade pip"
-      - "{{.VENV_DIR}}/bin/pip install --upgrade -r requirements.txt"
-      - echo "Dependencies updated ✓"
+      - "{{.UV}} sync --upgrade"
+      - echo "Dependencies updated with uv ✓"
+
+  uv-lock:
+    desc: "Generate/update uv.lock file"
+    cmds:
+      - "{{.UV}} lock"
+      - echo "uv.lock file updated ✓"
+    sources:
+      - pyproject.toml
+    generates:
+      - uv.lock
+
+  uv-add:
+    desc: "Add a new dependency (use DEP=package-name)"
+    cmds:
+      - |
+        if [ -z "{{.DEP}}" ]; then
+          echo "Usage: task uv-add DEP=package-name"
+          echo "Example: task uv-add DEP=requests"
+          exit 1
+        fi
+        {{.UV}} add "{{.DEP}}"
+        echo "Added dependency: {{.DEP}} ✓"
+
+  uv-add-dev:
+    desc: "Add a new development dependency (use DEP=package-name)"
+    cmds:
+      - |
+        if [ -z "{{.DEP}}" ]; then
+          echo "Usage: task uv-add-dev DEP=package-name"
+          echo "Example: task uv-add-dev DEP=pytest"
+          exit 1
+        fi
+        {{.UV}} add --dev "{{.DEP}}"
+        echo "Added dev dependency: {{.DEP}} ✓"
+
+  uv-remove:
+    desc: "Remove a dependency (use DEP=package-name)"
+    cmds:
+      - |
+        if [ -z "{{.DEP}}" ]; then
+          echo "Usage: task uv-remove DEP=package-name"
+          echo "Example: task uv-remove DEP=requests"
+          exit 1
+        fi
+        {{.UV}} remove "{{.DEP}}"
+        echo "Removed dependency: {{.DEP}} ✓"
+
+  uv-tree:
+    desc: "Show dependency tree"
+    cmds:
+      - "{{.UV}} tree"
+
+  uv-check:
+    desc: "Check for dependency issues"
+    cmds:
+      - "{{.UV}} sync --check"
+      - echo "Dependencies check passed ✓"
 
   # Git and Version Management Tasks
   git-setup:
@@ -183,22 +241,22 @@ tasks:
     desc: "Install pre-commit hooks"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/pre-commit install"
-      - "{{.VENV_DIR}}/bin/pre-commit install --hook-type commit-msg"
-      - "{{.VENV_DIR}}/bin/pre-commit install --hook-type post-commit"
+      - "{{.UV}} run pre-commit install"
+      - "{{.UV}} run pre-commit install --hook-type commit-msg"
+      - "{{.UV}} run pre-commit install --hook-type post-commit"
       - echo "Pre-commit hooks installed ✓"
 
   pre-commit-run:
     desc: "Run pre-commit on all files"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/pre-commit run --all-files"
+      - "{{.UV}} run pre-commit run --all-files"
 
   pre-commit-update:
     desc: "Update pre-commit hooks"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/pre-commit autoupdate"
+      - "{{.UV}} run pre-commit autoupdate"
       - echo "Pre-commit hooks updated ✓"
 
   # Commitizen Tasks
@@ -206,42 +264,42 @@ tasks:
     desc: "Interactive commit with Commitizen"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/cz commit"
+      - "{{.UV}} run cz commit"
 
   changelog:
     desc: "Generate changelog using Commitizen"
     deps: [install-dev]
     cmds:
-      - venv/bin/cz changelog --start-rev $(git rev-list --max-parents=0 HEAD)
+      - "{{.UV}} run cz changelog --start-rev $(git rev-list --max-parents=0 HEAD)"
 
   bump:
     desc: "Bump version and update changelog"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/cz bump"
+      - "{{.UV}} run cz bump"
 
   bump-dry:
     desc: "Dry run version bump"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/cz bump --dry-run"
+      - "{{.UV}} run cz bump --dry-run"
 
   version-check:
     desc: "Check current version"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/cz version"
+      - "{{.UV}} run cz version"
 
   version:
     desc: "Show version information"
     deps: [install]
     cmds:
       - echo "=== MkDocs Version ==="
-      - "{{.VENV_DIR}}/bin/mkdocs --version"
+      - "{{.UV}} run mkdocs --version"
       - echo "=== Python Version ==="
       - "{{.PYTHON}} --version"
       - echo "=== Pip Version ==="
-      - "{{.VENV_DIR}}/bin/pip --version"
+      - "{{.UV}} run pip --version"
 
   # Documentation Tasks
   new-page:
@@ -277,7 +335,7 @@ tasks:
     desc: "Deploy to GitHub Pages"
     deps: [build]
     cmds:
-      - "{{.VENV_DIR}}/bin/mkdocs gh-deploy --force"
+      - "{{.UV}} run mkdocs gh-deploy --force"
 
   deploy-check:
     desc: "Check deployment readiness"
@@ -380,4 +438,4 @@ tasks:
     deps: [install]
     cmds:
       - echo "Watching for changes... Press Ctrl+C to stop"
-      - "{{.VENV_DIR}}/bin/mkdocs serve --watch-theme"
+      - "{{.UV}} run mkdocs serve --watch-theme"

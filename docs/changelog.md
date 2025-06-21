@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fix
+
+- resolve Commitizen changelog generation with proper configuration and command
+
 ## v0.1.0 (2025-06-21)
 
 ### Feat

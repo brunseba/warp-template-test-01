@@ -1,7 +1,8 @@
 # Template Documentation
 
 [![Documentation Status](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://your-domain.com)
-[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
+[![uv](https://img.shields.io/badge/uv-package%20manager-blue.svg)](https://docs.astral.sh/uv/)
 [![MkDocs](https://img.shields.io/badge/mkdocs-1.5+-green.svg)](https://mkdocs.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -22,10 +23,11 @@ A comprehensive MkDocs documentation template with advanced features including g
 
 ### Prerequisites
 
-- Python 3.8+
-- Git
-- Google Chrome (for PDF export)
-- [Task](https://taskfile.dev/#/installation) (optional but recommended)
+- **Python 3.9+** (required for modern dependencies)
+- **[uv](https://docs.astral.sh/uv/)** - Modern, fast Python package manager
+- **Git** - Version control
+- **[Task](https://taskfile.dev/#/installation)** (optional but recommended)
+- **Google Chrome** (for PDF export)
 
 ### Installation
 
@@ -49,28 +51,31 @@ A comprehensive MkDocs documentation template with advanced features including g
 
 4. **Open your browser** to `http://localhost:8000`
 
-#### Option 2: Manual Setup
+#### Option 2: Manual Setup with uv
 
-1. **Clone the repository**:
+1. **Install uv** (if not already installed):
+   ```bash
+   # macOS and Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # Windows
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+2. **Clone the repository**:
    ```bash
    git clone https://github.com/your-username/template-doc.git
    cd template-doc
    ```
 
-2. **Create and activate virtual environment**:
+3. **Install dependencies with uv**:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
 4. **Start development server**:
    ```bash
-   mkdocs serve
+   uv run mkdocs serve
    ```
 
 5. **Open your browser** to `http://localhost:8000`
@@ -267,16 +272,48 @@ ENABLE_PDF_EXPORT=1 mkdocs build
 
 ## 📦 Dependencies
 
-Key dependencies include:
+This project uses modern Python packaging with **pyproject.toml** and **uv** for fast dependency management.
+
+### Core Dependencies
 
 - `mkdocs` - Static site generator
-- `mkdocs-material` - Material theme
+- `mkdocs-material` - Material theme  
 - `mkdocs-git-revision-date-localized-plugin` - Git revision tracking
-- `mkdocs-git-committers-plugin-2` - Contributor information
-- `mkdocs-with-pdf` - PDF export functionality
+- `mkdocs-git-authors-plugin` - Contributor information
 - `pymdown-extensions` - Additional Markdown extensions
+- `pillow` - Image processing for themes
+- `cairosvg` - SVG support
 
-See `requirements.txt` for complete list with versions.
+### Development Dependencies
+
+- `pytest` - Testing framework
+- `black`, `isort`, `flake8` - Code formatting and linting
+- `mypy` - Type checking
+- `pre-commit` - Git hooks
+- `commitizen` - Conventional commits
+- `bandit`, `safety` - Security scanning
+- `yamllint` - YAML validation
+
+### Package Management with uv
+
+```bash
+# Add new dependency
+task uv-add DEP=package-name
+
+# Add development dependency
+task uv-add-dev DEP=package-name
+
+# Remove dependency
+task uv-remove DEP=package-name
+
+# Show dependency tree
+task uv-tree
+
+# Update dependencies
+task update
+```
+
+See `pyproject.toml` for complete dependency specifications and optional extras.
 
 ## 🤝 Contributing
 
