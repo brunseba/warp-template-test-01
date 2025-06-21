@@ -5,10 +5,6 @@ commitizen:
   # Use conventional commits style
   name: cz_conventional_commits
   
-  # Version management
-  version_scheme: semantic
-  version_provider: scm
-  
   # Changelog configuration
   changelog_file: docs/changelog.md
   changelog_format: $version ($date)

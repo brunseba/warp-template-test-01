@@ -209,10 +209,10 @@ tasks:
       - "{{.VENV_DIR}}/bin/cz commit"
 
   changelog:
-    desc: "Generate changelog with Commitizen"
+    desc: "Generate changelog using Commitizen"
     deps: [install-dev]
     cmds:
-      - "{{.VENV_DIR}}/bin/cz changelog"
+      - venv/bin/cz changelog --start-rev $(git rev-list --max-parents=0 HEAD)
 
   bump:
     desc: "Bump version and update changelog"
